@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
+const mongoose = require("mongoose");
+const {db_link} = require('./secrets')
 let user = [
   {
     id: 1,
@@ -9,12 +11,12 @@ let user = [
   },
   {
     id: 2,
-    name: "deep",
+    name: "candy",
     age: 10,
   },
   {
     id: 3,
-    name: "sm",
+    name: "mandy",
     age: 50,
   },
 ];
@@ -26,7 +28,8 @@ app.use("/auth", authRouter);
 
 userRouter
   .route("/")
-  .get(getUser)
+  //   .get(middleware1,getUser,middleware2)
+  .get(middleware1,getUsers)
   .post(postUser)
   .patch(updateUser)
   .delete(deleteUser);
@@ -46,14 +49,32 @@ authRouter.route("/signup").get(getSignup).post(postSignup);
 //params
 // app.get('/user/:name', );
 
-function getUser(req, res) {
+// middleware
+function middleware1(req, res,next){
+  console.log("middleware1 called");
+  next();
+}
+// function middleware2(req,res) {
+//   console.log("middleware2 called");
+//   res.json({msg: "user returned"})
+// }
+
+async function getUsers(req, res) {
   console.log(req.query);
   let { name, age } = req.query;
   // let filteredData=user.filter(userObj => {
   //     return (userObj.name==name && userObj.age==age)
   // })
   // res.send(filteredData);
-  res.send(user);
+    
+    
+    //get all users from db
+    let allUsers=await userModel.findOne({name:"Abhishek"} )
+
+
+    res.json({ msg: "users retrieved", allUsers });
+    // console.log("getUser called ");
+    // next();
 }
 
 function postUser(req, res) {
@@ -95,14 +116,63 @@ function getSignup(req, res){
   res.sendFile("/public/index.html", {root:-__dirname});
 }
 
-function postSignup(req, res){
-  let { email, name, password } = req.body;
+async function postSignup(req, res){
+  // let { email, name, password } = req.body;
+  
+  try{
+  let data = req.body;
+  let user = await userModel.create(user);
   console.log(req.body);
+  // res.json({
+  //     msg: "user signed up",
+  //     email,
+  //     name,
+  //     password
+  // })
   res.json({
-      msg: "user signed up",
-      email,
-      name,
-      password
+    msg: "user signed up",
+    user,
   })
 }
+catch(err){
+  res.json({
+    err:err.message
+  })
+}
+}
 app.listen(5000);
+
+mongoose.connect(db_link)
+  .then(function (db){
+    console.log("db connect");
+  })
+  .catch(function(err){
+    console.log(err);
+  })
+
+  const userSchema = mongoose.Schema(
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+        unique: true,
+      },
+      password: {
+        type: String,
+        required: true,
+        minLength : 7,
+      },
+      confirmPassword: {
+        type: String,
+        required: true,
+        minLength : 7,
+      },
+    }
+  )
+
+  // model
+  const userModel = mongoose.model("useModel", userSchema);
