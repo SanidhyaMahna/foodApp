@@ -1,7 +1,6 @@
 const userModel = require("../models/userModel");
 var jwt = require("jsonwebtoken");
 const { JWT_KEY } = require('../secrets');
-const { use } = require("../Routers/userRouter");
 console.log("1234 ", JWT_KEY);
 
 
@@ -31,7 +30,6 @@ module.exports.login=async function (req, res) {
     // console.log(req.body.email);
   try {
     let { email, password } = req.body;
-    console.log(user);
     let user = await userModel.findOne({ email: email });
     if (user) {
       //check if password matches
