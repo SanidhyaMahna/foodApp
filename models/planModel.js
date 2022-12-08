@@ -34,7 +34,12 @@ mongoose
     },
     ratingsAverage:{
         type: Number,
+        default: 0
        
+    },
+    nor:{
+        type: Number,
+        default :0
     }
   });
 
