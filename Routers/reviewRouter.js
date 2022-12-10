@@ -1,6 +1,7 @@
 const express = require("express");
 const reviewRouter = express.Router();
 const { isAuthorised, protectRoute } = require('../helper');
+const {getAllReviews, top3Review, getPlanReview, createReview, updateReview, deleteReview} = require("../helper");
 
 reviewRouter
     .route("/all")
@@ -15,7 +16,7 @@ reviewRouter
     .route("/:id")
     .get(getPlanReview);
 
-
+reviewRouter.use(protectRoute)
 reviewRouter
     .route("/crud:/plan")
     .post(createReview)

@@ -103,6 +103,8 @@ module.exports.updateReview = async function(req,res){
             if(key == id) continue;
             keys.push(key);
         }
+        // keys.includes("rating");
+        // use reviews rating to calculate average rating and update in plan 
        let review = await reviewModel.findById(id);
        for(let i = 0; i < keys.length; i++){
         review[keys[i]] = dataToBeUpdated[keys[i]];
@@ -117,6 +119,25 @@ module.exports.updateReview = async function(req,res){
     catch(err){
         res.json({
             msg: err.message
+        })
+    }
+}
+
+module.exports.deleteReview = async function (req,res){
+    try{
+        let planId = req.body.id;
+        let id = req.body.id;
+        // change avg rating of plan
+        let review = await reviewModel.findByIdAndDelete(id);
+        res.json({
+            message: "review deleted",
+            review,
+        })
+
+    }
+    catch(err){
+        return res.json({
+            msg:err.message,
         })
     }
 }
